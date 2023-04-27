@@ -1,15 +1,18 @@
-import * as dotenv from "dotenv";
-import { OpenAI } from "langchain";
+import { PDFLoader } from "langchain/document_loaders";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
-dotenv.config();
+const loader = new PDFLoader("data/stormDataDef.pdf");
 
-const model = new OpenAI({
-  modelName: "gpt-3.5-turbo",
-  openAIApiKey: process.env.OPENAI_API_KEY,
+const docs = await loader.load();
+console.log(docs !== null ? "loaded" : "Not loaded");
+
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 4000,
+  chunkOverlap: 200,
 });
 
-const res = await model.call(
-  "What's a good idea for an application to build with GPT-3?"
-);
+const output = await splitter.splitDocuments(docs);
 
-console.log(res);
+
+console.log(output !== null ? "split" : "Not split");
